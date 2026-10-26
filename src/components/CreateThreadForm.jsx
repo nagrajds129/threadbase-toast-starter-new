@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "../context/ToastContext.jsx";
@@ -9,11 +10,19 @@ export default function CreateThreadForm() {
 
   const mutation = useMutation({
     mutationFn: createThread,
-    // TODO (Task 3): on success, fire a green toast: showToast("Thread posted!", "success")
-    onSuccess: () => {},
-    // TODO (Task 3): on error, read error.response?.data?.message (fall back to a generic
-    //   string) and fire a red toast: showToast(message, "error")
-    onError: () => {},
+
+    // Show a success toast
+    onSuccess: () => {
+      showToast("Thread posted!", "success");
+    },
+
+    // Show an error toast
+    onError: (error) => {
+      const message =
+        error.response?.data?.message || "Something went wrong. Please try again.";
+
+      showToast(message, "error");
+    },
   });
 
   function handleSubmit(e) {
@@ -25,17 +34,24 @@ export default function CreateThreadForm() {
   return (
     <form className="card" onSubmit={handleSubmit}>
       <h2>Create a thread</h2>
+
       <p className="hint">
         Tip: the title <code>Welcome to Threadbase</code> already exists, so posting it
         triggers a duplicate-title error.
       </p>
+
       <input
         className="input"
         placeholder="Thread title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <button className="btn" type="submit" disabled={mutation.isPending}>
+
+      <button
+        className="btn"
+        type="submit"
+        disabled={mutation.isPending}
+      >
         {mutation.isPending ? "Posting..." : "Post thread"}
       </button>
     </form>
